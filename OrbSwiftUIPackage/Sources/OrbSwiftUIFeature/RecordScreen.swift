@@ -43,19 +43,17 @@ public struct RecordScreen: View {
                     header
 
                     // MARK: - Content area
-                    ZStack {
-                        // Orb at top 5%
-                        VStack {
-                            Spacer()
-                                .frame(height: geo.size.height * 0.05)
+                    VStack(spacing: 0) {
+                        Spacer()
+                            .frame(height: geo.size.height * 0.05)
 
-                            OrbView(intensity: recorder.intensity, size: 320, isRecording: recorder.isRecording, stage: orbStage)
-                                .frame(width: 320, height: 320)
+                        OrbView(intensity: recorder.intensity, size: 280, isRecording: recorder.isRecording, stage: orbStage)
+                            .frame(width: 280, height: 280)
 
-                            Spacer()
-                        }
+                        Spacer()
+                            .frame(height: NSpacing.xl)
 
-                        // Prompt text / response at ~50%
+                        // Prompt text / response / mic permission
                         if recorder.permissionGranted && !recorder.isRecording {
                             VStack(spacing: NSpacing.sm) {
                                 switch processingStage {
@@ -102,26 +100,20 @@ public struct RecordScreen: View {
                                 }
                             }
                             .animation(.easeInOut(duration: 0.3), value: processingStage)
-                            .position(x: geo.size.width / 2, y: geo.size.height * 0.45)
+                        } else if !recorder.permissionGranted && !hasRequestedPermission {
+                            micPermissionPrompt
                         }
 
-                        // Mic permission prompt
-                        if !recorder.permissionGranted && !hasRequestedPermission {
-                            micPermissionPrompt
-                                .position(x: geo.size.width / 2, y: geo.size.height * 0.45)
-                        }
+                        Spacer()
 
                         // ScrubBar pinned to bottom of content
                         if recorder.permissionGranted {
-                            VStack {
-                                Spacer()
-                                ScrubBar(
-                                    duration: targetDuration,
-                                    currentTime: recorder.duration
-                                )
-                                .padding(.horizontal, NSpacing.xl)
-                                .padding(.bottom, NSpacing.md)
-                            }
+                            ScrubBar(
+                                duration: targetDuration,
+                                currentTime: recorder.duration
+                            )
+                            .padding(.horizontal, NSpacing.xl)
+                            .padding(.bottom, NSpacing.md)
                         }
                     }
                     .frame(maxHeight: .infinity)
